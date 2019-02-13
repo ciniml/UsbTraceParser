@@ -5,12 +5,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-
 using PropertyBagType = System.Collections.Specialized.OrderedDictionary;
 
-namespace UsbTraceParser
+namespace TraceEventParserUtil
 {
     internal class EventDataTypeUtil
     {
@@ -33,7 +30,7 @@ namespace UsbTraceParser
 
         internal static IntPtr ToIntPtr(byte[] data, int offset)
         {
-            if (IntPtr.Size == Marshal.SizeOf<int>())
+            if (IntPtr.Size == Marshal.SizeOf(typeof(int)))
             {
                 return new IntPtr(BitConverter.ToInt32(data, offset));
             }
@@ -45,7 +42,7 @@ namespace UsbTraceParser
 
         internal static UIntPtr ToUIntPtr(byte[] data, int offset)
         {
-            if (UIntPtr.Size == Marshal.SizeOf<uint>())
+            if (UIntPtr.Size == Marshal.SizeOf(typeof(uint)))
             {
                 return new UIntPtr(BitConverter.ToUInt32(data, offset));
             }
@@ -260,17 +257,6 @@ namespace UsbTraceParser
             return (Func<TEventDataHost, byte[], int, int, int>) CreateInitializer(typeof (TEventDataHost), false);
         }
     }
-    public abstract class EventDataType<TDerived> : IEventDataType where TDerived : EventDataType<TDerived>
-    {
-        private readonly int eventDataLength;
 
-        private static readonly Func<TDerived, byte[], int, int, int> Initializer = EventDataParserHelper.CreateInitializer<TDerived>();
-
-        int IEventDataType.Length => eventDataLength;
-
-        protected EventDataType(byte[] eventData, int offset, int length)
-        {
-            this.eventDataLength = Initializer((TDerived)this, eventData, offset, length);
-        }
-    }
+    
 }
